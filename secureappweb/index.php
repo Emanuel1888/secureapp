@@ -114,7 +114,7 @@
   const password = document.getElementById('password').value;
 
   try {
-    const res = await fetch('http://192.168.43.106:3000/auth/login.php', {
+    const res = await fetch('https://secureapp-q3uk.onrender.com/auth/login.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
