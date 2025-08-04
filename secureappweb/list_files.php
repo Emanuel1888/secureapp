@@ -78,7 +78,7 @@
       return;
     }
 
-    fetch('http://192.168.43.106:3000/controllers/list_files.php', {
+    fetch('https://secureapp-q3uk.onrender.com/controllers/list_files.php', {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + token
