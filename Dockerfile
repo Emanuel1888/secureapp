@@ -11,7 +11,7 @@ RUN a2enmod rewrite
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Copiar el contenido del proyecto al directorio público del servidor
-COPY secureapp/ /var/www/html/
+COPY secureapp - web/ /var/www/html/
 
 # Establece permisos adecuados
 RUN chown -R www-data:www-data /var/www/html
