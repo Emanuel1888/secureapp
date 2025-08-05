@@ -104,39 +104,61 @@
   </div>
 
   <script>
- const form = document.getElementById('loginForm'); // declara aquí
-  form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('loginForm');
+    const responseDiv = document.getElementById('response');
 
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  try {
-    const response = await fetch('https://secureapp-q3uk.onrender.com/auth/login.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password })
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Limpiar mensajes anteriores
+      responseDiv.textContent = '';
+      responseDiv.style.color = 'black';
+
+      try {
+        const res = await fetch('https://secureapp-q3uk.onrender.com/auth/login.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        // Leer respuesta como texto para diagnosticar mejor
+        const text = await res.text();
+
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (err) {
+          responseDiv.style.color = 'red';
+          responseDiv.textContent = 'Respuesta inválida del servidor (no JSON).';
+          console.error('Respuesta cruda:', text);
+          return;
+        }
+
+        if (res.ok && data.success === true) {
+          responseDiv.style.color = 'green';
+          responseDiv.textContent = data.message || 'Login exitoso.';
+
+          setTimeout(() => {
+            window.location.href = 'https://secureapp-q3uk.onrender.com/auth/verify_token.php';
+          }, 1000);
+        } else {
+          responseDiv.style.color = 'red';
+          responseDiv.textContent = data.error || data.message || 'Error en login.';
+        }
+      } catch (error) {
+        responseDiv.style.color = 'red';
+        responseDiv.textContent = 'No se pudo conectar con el servidor.';
+        console.error('Error de red:', error);
+      }
     });
+  });
+</script>
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (data.success === true && data.message === 'Token enviado al correo electrónico.') {
-      window.location.href = 'verify_token.html';
-    } else {
-      alert(data.message || 'Error al iniciar sesión.');
-    }
-
-  } catch (error) {
-    console.error('Error de red:', error);
-    alert('No se pudo conectar con el servidor.');
-  }
-});
-  </script>
 </body>
 </html>
