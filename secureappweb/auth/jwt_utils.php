@@ -12,8 +12,8 @@ function base64url_decode($data) {
 
 // Carga la clave secreta para firmar/verificar tokens desde el archivo .env
 function get_jwt_secret() {
-    $env = parse_ini_file(__DIR__ . '/../.env'); // Lee el archivo .env
-    return $env['JWT_SECRET'] ?? 'clave_por_defecto'; // Devuelve la clave o valor por defecto
+    $secret = getenv('JWT_SECRET');
+    return $secret !== false ? $secret : 'clave_por_defecto';
 }
 
 
