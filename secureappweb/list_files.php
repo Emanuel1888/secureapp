@@ -94,12 +94,12 @@
       const table = document.getElementById('filesTable');
       const tbody = document.getElementById('filesBody');
       const uploadForm = document.getElementById('uploadForm');
-      const fileInput = document.getElementById('fileInput');
+    
 
 
 
 
-      if (!token) {
+      if (!) {
         message.textContent = 'No hay token. Inicia sesión.';
         message.className = 'message error';
         message.style.display = 'block';
@@ -193,7 +193,6 @@
       // Subida de archivo
 
 const fileInput = document.getElementById('file');
-const token = localStorage.getItem('jwtToken'); // o donde guardes tu token
 
 uploadForm.addEventListener('submit', async (e) => {
   e.preventDefault();
