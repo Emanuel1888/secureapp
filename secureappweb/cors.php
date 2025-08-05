@@ -24,7 +24,7 @@ $allowed_origins = [
 ];
 
 // Detectar el origen de la petición
-$origin = $_SERVER['HTTP_ORIGIN'] ?? 'https://secureapp-q3uk.onrender.com';
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
 // Validar origen y establecer header si está permitido
 if (in_array($origin, $allowed_origins)) {
