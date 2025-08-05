@@ -24,7 +24,7 @@ $allowed_origins = [
 ];
 
 // Detectar el origen de la petición
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$origin = $_SERVER['HTTP_ORIGIN'] ?? 'http://localhost:3000/';
 
 // Validar origen y establecer header si está permitido
 if (in_array($origin, $allowed_origins)) {
