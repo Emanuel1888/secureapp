@@ -41,6 +41,21 @@
       background-color: #ffe0e0;
       border: 1px solid #f44336;
     }
+    .btn {
+      padding: 0.5rem 1rem;
+      margin-right: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .download-btn {
+      background-color: #4caf50;
+      color: white;
+    }
+    .delete-btn {
+      background-color: #f44336;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -57,6 +72,7 @@
         <th>Tipo MIME</th>
         <th>Tamaño (bytes)</th>
         <th>Subido en</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody id="filesBody">
@@ -96,10 +112,57 @@
             <td>${file.mime_type}</td>
             <td>${(file.size / 1024).toFixed(2)} KB</td>
             <td>${file.uploaded_at}</td>
+            <td>
+              <button class="btn download-btn" data-filename="${file.filename}">Descargar</button>
+              <button class="btn delete-btn" data-id="${file.id}">Eliminar</button>
+            </td>
           `;
           tbody.appendChild(row);
         });
         table.style.display = 'table';
+
+        // Acción de descarga
+        document.querySelectorAll('.download-btn').forEach(button => {
+          button.addEventListener('click', () => {
+            const filename = button.getAttribute('data-filename');
+            window.open(`https://secureapp-q3uk.onrender.com/uploads/${filename}`, '_blank');
+          });
+        });
+
+        // Acción de eliminación
+        document.querySelectorAll('.delete-btn').forEach(button => {
+          button.addEventListener('click', () => {
+            const fileId = button.getAttribute('data-id');
+            if (confirm('¿Estás seguro de que deseas eliminar este archivo?')) {
+              fetch(`https://secureapp-q3uk.onrender.com/controllers/delete_file.php?file_id=${fileId}`, {
+                method: 'GET',
+                headers: {
+                  'Authorization': 'Bearer ' + token
+                }
+              })
+              .then(res => res.json())
+              .then(response => {
+                if (response.success) {
+                  // Eliminar fila de la tabla sin recargar
+                  button.closest('tr').remove();
+                  message.textContent = response.message;
+                  message.className = 'message success';
+                  message.style.display = 'block';
+                } else {
+                  message.textContent = response.error || 'Error al eliminar.';
+                  message.className = 'message error';
+                  message.style.display = 'block';
+                }
+              })
+              .catch(err => {
+                message.textContent = 'Error de red: ' + err.message;
+                message.className = 'message error';
+                message.style.display = 'block';
+              });
+            }
+          });
+        });
+
       } else {
         message.textContent = data.error || 'Error al cargar archivos.';
         message.className = 'message error';
@@ -112,7 +175,7 @@
       message.style.display = 'block';
     });
   });
-</script>
+  </script>
 
 </body>
 </html>
