@@ -14,7 +14,7 @@ function get_config(string $key, $default = null) {
 }
 
 // Obtener dominio principal desde configuración (variable de entorno o .env)
-$main_domain = get_config('MAIN_DOMAIN', 'http://localhost:3000');
+$main_domain = get_config('MAIN_DOMAIN', 'http://localhost:3000/');
 
 // Lista blanca de orígenes permitidos
 $allowed_origins = [
@@ -24,7 +24,7 @@ $allowed_origins = [
 ];
 
 // Detectar el origen de la petición
-$origin = $_SERVER['HTTP_ORIGIN'] ?? 'http://localhost:3000/';
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
 // Validar origen y establecer header si está permitido
 if (in_array($origin, $allowed_origins)) {
