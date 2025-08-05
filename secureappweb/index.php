@@ -105,41 +105,37 @@
 
   <script>
     const form = document.getElementById('loginForm');
-    const responseDiv = document.getElementById('response');
-
-    form.addEventListener('submit', async (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value;
+  const formData = new FormData(form);
 
   try {
-    const res = await fetch('https://secureapp-q3uk.onrender.com/auth/login.php', {
+    const response = await fetch('https://secureapp-q3uk.onrender.com/auth/login.php', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password })
+      body: formData,
     });
 
-    const data = await res.json();
-
-    if (res.ok) {
-      responseDiv.style.color = 'green';
-      responseDiv.textContent = data.message;
-
-      // Redirigir a verificar_token.php después de mostrar mensaje (puedes ajustar tiempo si quieres)
-      setTimeout(() => {
-        window.location.href = 'https://secureapp-q3uk.onrender.com/auth/verify_token.php';
-      }, 1000); // 1 segundo de espera para que vea el mensaje
-    } else {
-      responseDiv.style.color = 'red';
-      responseDiv.textContent = data.error || data.message;
+    // Verifica que la respuesta tenga status 200
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const data = await response.json();
+
+    // Aquí validamos que sea exactamente la respuesta esperada
+    if (data.success === true && data.message === 'Token enviado al correo electrónico.') {
+      // Redireccionar a la página de verificación del token
+      window.location.href = 'verify_token.html';
+    } else {
+      // Mostrar mensaje de error (puedes ajustar según tu UI)
+      alert(data.message || 'Error al iniciar sesión.');
+    }
+
   } catch (error) {
-    responseDiv.style.color = 'red';
-    responseDiv.textContent = 'Error de conexión con el servidor.';
+    console.error('Error de red:', error);
+    alert('No se pudo conectar con el servidor.');
   }
-});  </script>
+});</script>
 </body>
 </html>
