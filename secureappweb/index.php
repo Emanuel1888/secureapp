@@ -104,60 +104,61 @@
   </div>
 
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('loginForm');
-    const responseDiv = document.getElementById('response');
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('loginForm');
+  const responseDiv = document.getElementById('response');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
 
-      // Limpiar mensajes anteriores
-      responseDiv.textContent = '';
-      responseDiv.style.color = 'black';
+    // Limpiar mensajes previos
+    responseDiv.textContent = '';
+    responseDiv.style.color = 'black';
 
+    try {
+      const res = await fetch('https://secureapp-q3uk.onrender.com/auth/login.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      });
+
+      // Leer respuesta como texto (para poder depurar fácilmente)
+      const text = await res.text();
+
+      let data;
       try {
-        const res = await fetch('https://secureapp-q3uk.onrender.com/auth/login.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ username, password })
-        });
-
-        // Leer respuesta como texto para diagnosticar mejor
-        const text = await res.text();
-
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (err) {
-          responseDiv.style.color = 'red';
-          responseDiv.textContent = 'Respuesta inválida del servidor (no JSON).';
-          console.error('Respuesta cruda:', text);
-          return;
-        }
-
-        if (res.ok && data.success === true) {
-          responseDiv.style.color = 'green';
-          responseDiv.textContent = data.message || 'Login exitoso.';
-
-          setTimeout(() => {
-            window.location.href = 'https://secureapp-q3uk.onrender.com/auth/verify_token.php';
-          }, 1000);
-        } else {
-          responseDiv.style.color = 'red';
-          responseDiv.textContent = data.error || data.message || 'Error en login.';
-        }
-      } catch (error) {
+        data = JSON.parse(text);
+      } catch (err) {
         responseDiv.style.color = 'red';
-        responseDiv.textContent = 'No se pudo conectar con el servidor.';
-        console.error('Error de red:', error);
+        responseDiv.textContent = 'Respuesta inválida del servidor (no JSON).';
+        console.error('Respuesta cruda:', text);
+        return;
       }
-    });
+
+      if (res.ok && data.success === true) {
+        responseDiv.style.color = 'green';
+        responseDiv.textContent = data.message || 'Token enviado al correo.';
+
+        setTimeout(() => {
+          window.location.href = 'https://secureapp-q3uk.onrender.com/auth/verify_token.php';
+        }, 1000);
+      } else {
+        responseDiv.style.color = 'red';
+        responseDiv.textContent = data.error || data.message || 'Error en login.';
+      }
+    } catch (error) {
+      responseDiv.style.color = 'red';
+      responseDiv.textContent = 'No se pudo conectar con el servidor.';
+      console.error('Error de red:', error);
+    }
   });
+});
+
 </script>
 
 </body>
