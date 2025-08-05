@@ -96,6 +96,9 @@
       const uploadForm = document.getElementById('uploadForm');
       const fileInput = document.getElementById('fileInput');
 
+
+
+
       if (!token) {
         message.textContent = 'No hay token. Inicia sesión.';
         message.className = 'message error';
@@ -188,55 +191,64 @@
       };
 
       // Subida de archivo
-      uploadForm.addEventListener('submit', (e) => {
-        e.preventDefault();
 
-        const file = fileInput.files[0];
-        if (!file) {
-          message.textContent = 'Selecciona un archivo antes de subir.';
-          message.className = 'message error';
-          message.style.display = 'block';
-          return;
+  if (!token) {
+    message.textContent = 'Debes iniciar sesión para subir archivos.';
+    message.className = 'message error';
+    message.style.display = 'block';
+    return;
+  }
+
+  uploadForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const file = fileInput.files[0];
+    if (!file) {
+      message.textContent = 'Selecciona un archivo antes de subir.';
+      message.className = 'message error';
+      message.style.display = 'block';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('https://secureapp-q3uk.onrender.com/controllers/upload.php', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      },
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        message.textContent = data.message;
+        message.className = 'message success';
+        message.style.display = 'block';
+        fileInput.value = '';
+        cargarArchivos(); // Función que recarga la tabla
+      } else {
+        let errorMsg = data.error || 'Error al subir.';
+        if (data.details) {
+          errorMsg += ' Detalles: ' + data.details;
         }
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        fetch('https://secureapp-q3uk.onrender.com/controllers/upload.php', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer ' + token
-          },
-          body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            message.textContent = data.message;
-            message.className = 'message success';
-            message.style.display = 'block';
-            fileInput.value = '';
-            cargarArchivos(); // recargar tabla
-          } else {
-            let errorMsg = data.error || 'Error al subir.';
-            if (data.details) {
-              errorMsg += ' Detalles: ' + data.details;
-            }
-            message.textContent = errorMsg;
-            message.className = 'message error';
-            message.style.display = 'block';
-          }
-        })
-        .catch(err => {
-          message.textContent = 'Error de red: ' + err.message;
-          message.className = 'message error';
-          message.style.display = 'block';
-        });
-      });
-
-      // Cargar archivos al inicio
-      cargarArchivos();
+        message.textContent = errorMsg;
+        message.className = 'message error';
+        message.style.display = 'block';
+      }
+    })
+    .catch(err => {
+      message.textContent = 'Error de red: ' + err.message;
+      message.className = 'message error';
+      message.style.display = 'block';
     });
+  });
+
+  // Cargar archivos al inicio
+  cargarArchivos();
+});
+
   </script>
 </body>
 </html>
