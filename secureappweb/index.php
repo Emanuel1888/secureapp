@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         responseDiv.textContent = data.message || 'Token enviado al correo.';
 
         setTimeout(() => {
-          window.location.href = 'https://secureapp-q3uk.onrender.com/auth/verify_token.php';
+          window.location.href = 'https://secureapp-q3uk.onrender.com/verify_token.php';
         }, 1000);
       } else {
         responseDiv.style.color = 'red';
