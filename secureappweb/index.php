@@ -104,31 +104,30 @@
   </div>
 
   <script>
-    const form = document.getElementById('loginForm');
-form.addEventListener('submit', async (e) => {
+   form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const formData = new FormData(form);
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
 
   try {
     const response = await fetch('https://secureapp-q3uk.onrender.com/auth/login.php', {
       method: 'POST',
-      body: formData,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, password })
     });
 
-    // Verifica que la respuesta tenga status 200
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
 
-    // Aquí validamos que sea exactamente la respuesta esperada
     if (data.success === true && data.message === 'Token enviado al correo electrónico.') {
-      // Redireccionar a la página de verificación del token
       window.location.href = 'verify_token.html';
     } else {
-      // Mostrar mensaje de error (puedes ajustar según tu UI)
       alert(data.message || 'Error al iniciar sesión.');
     }
 
@@ -136,6 +135,7 @@ form.addEventListener('submit', async (e) => {
     console.error('Error de red:', error);
     alert('No se pudo conectar con el servidor.');
   }
-});</script>
+});
+  </script>
 </body>
 </html>
