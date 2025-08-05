@@ -192,61 +192,44 @@
 
       // Subida de archivo
 
-  if (!token) {
-    message.textContent = 'Debes iniciar sesión para subir archivos.';
-    message.className = 'message error';
-    message.style.display = 'block';
+const fileInput = document.getElementById('file');
+const token = localStorage.getItem('jwtToken'); // o donde guardes tu token
+
+uploadForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const file = fileInput.files[0];
+  if (!file) {
+    alert('Por favor selecciona un archivo.');
     return;
   }
 
-  uploadForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+  const formData = new FormData();
+  formData.append('file', file);
 
-    const file = fileInput.files[0];
-    if (!file) {
-      message.textContent = 'Selecciona un archivo antes de subir.';
-      message.className = 'message error';
-      message.style.display = 'block';
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    fetch('https://secureapp-q3uk.onrender.com/controllers/upload.php', {
+  try {
+    const response = await fetch('https://secureapp-q3uk.onrender.com/controllers/upload.php', {
       method: 'POST',
+      body: formData,
       headers: {
-        'Authorization': 'Bearer ' + token
-      },
-      body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        message.textContent = data.message;
-        message.className = 'message success';
-        message.style.display = 'block';
-        fileInput.value = '';
-        cargarArchivos(); // Función que recarga la tabla
-      } else {
-        let errorMsg = data.error || 'Error al subir.';
-        if (data.details) {
-          errorMsg += ' Detalles: ' + data.details;
-        }
-        message.textContent = errorMsg;
-        message.className = 'message error';
-        message.style.display = 'block';
+        'Authorization': `Bearer ${token}` // IMPORTANTE
+        // No pongas 'Content-Type': multipart/form-data aquí
       }
-    })
-    .catch(err => {
-      message.textContent = 'Error de red: ' + err.message;
-      message.className = 'message error';
-      message.style.display = 'block';
     });
-  });
 
-  // Cargar archivos al inicio
-  cargarArchivos();
+    const result = await response.json();
+
+    if (response.ok) {
+      alert('Archivo subido correctamente.');
+      console.log(result);
+    } else {
+      console.error('Error en la respuesta:', result);
+      alert(`Error al subir el archivo: ${result.message || 'Error desconocido'}`);
+    }
+  } catch (error) {
+    console.error('Error de red:', error);
+    alert('Error de red al subir el archivo.');
+  }
 });
 
   </script>
