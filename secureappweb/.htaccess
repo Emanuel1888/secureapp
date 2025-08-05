@@ -16,10 +16,10 @@ Options -Indexes
 
 # MODIFICAIÓN 1############################
 # 🔴 [Eliminado]: Bloqueo de ejecución PHP
- <FilesMatch "\.(php|php5|phtml)$">
-     Order Deny,Allow
-    Deny from all
- </FilesMatch>
+ #<FilesMatch "\.(php|php5|phtml)$">
+ #    Order Deny,Allow
+ #  Deny from all
+ #</FilesMatch>
 
 # Protección básica contra XSS y clickjacking
 <IfModule mod_headers.c>
