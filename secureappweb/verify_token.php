@@ -106,7 +106,7 @@
     try {
       const res = await fetch('https://secureapp-q3uk.onrender.com/auth/verify_token.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json',  'Authorization': `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({ token })
       });
 
