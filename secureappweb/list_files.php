@@ -196,7 +196,7 @@
             }
         
             // Usamos una ruta protegida que valida el archivo y fuerza descarga
-            const downloadUrl = `https://secureapp-q3uk.onrender.com/controllers/download_file.php?file_id=${fileId}`;
+            const downloadUrl = `https://secureapp-q3uk.onrender.com/controllers/download_files.php?file_id=${fileId}`;
             
             // Abrimos en una nueva pestaña (la sesión se valida con el token)
             // Si tu servidor no permite encabezados Authorization en descargas,
