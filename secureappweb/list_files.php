@@ -176,7 +176,7 @@
             <td>${(file.size / 1024).toFixed(2)} KB</td>
             <td>${file.uploaded_at}</td>
             <td>
-              <button class="btn download-btn" data-filename="${file.filename}">Descargar</button>
+              <button class="btn download-btn" data-id="${file.id}">Descargar</button>
               <button class="btn delete-btn" data-id="${file.id}">Eliminar</button>
             </td>
           `;
@@ -185,10 +185,23 @@
         table.style.display = 'table';
 
         // Acción de descarga
-        document.querySelectorAll('.download-btn').forEach(button => {
+       document.querySelectorAll('.download-btn').forEach(button => {
           button.addEventListener('click', () => {
-            const filename = button.getAttribute('data-filename');
-            window.open(`https://secureapp-q3uk.onrender.com/uploads/${filename}`, '_blank');
+            const fileId = button.getAttribute('data-id');
+            const token = localStorage.getItem('jwt_token');
+            
+            if (!token) {
+              alert('No hay token de sesión. Inicia sesión primero.');
+              return;
+            }
+        
+            // Usamos una ruta protegida que valida el archivo y fuerza descarga
+            const downloadUrl = `https://secureapp-q3uk.onrender.com/controllers/download_file.php?file_id=${fileId}`;
+            
+            // Abrimos en una nueva pestaña (la sesión se valida con el token)
+            // Si tu servidor no permite encabezados Authorization en descargas,
+            // puedes usar cookies o un token temporal en la URL si es necesario.
+            window.open(downloadUrl, '_blank');
           });
         });
 
