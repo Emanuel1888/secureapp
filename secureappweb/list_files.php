@@ -64,7 +64,7 @@
 <body>
   <h1>Archivos del Usuario</h1>
 
-  <form id="uploadForm" enctype="multipart/form-data">
+ <form id="uploadForm" enctype="multipart/form-data">
     <label for="fileInput">Subir imagen:</label>
     <input type="file" id="fileInput" name="file" accept="image/*" required />
     <button type="submit" class="btn upload-btn">Subir</button>
@@ -83,21 +83,17 @@
         <th>Acciones</th>
       </tr>
     </thead>
-    <tbody id="filesBody">
-    </tbody>
+    <tbody id="filesBody"></tbody>
   </table>
-
+  
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+   document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem('jwt_token');
       const message = document.getElementById('message');
       const table = document.getElementById('filesTable');
       const tbody = document.getElementById('filesBody');
       const uploadForm = document.getElementById('uploadForm');
       const fileInput = document.getElementById('fileInput');
-
-
-
 
       if (!token) {
         message.textContent = 'No hay token. Inicia sesión.';
@@ -106,17 +102,23 @@
         return;
       }
 
+      // Función para mostrar mensajes
+      function showMessage(text, type = 'error') {
+        message.textContent = text;
+        message.className = `message ${type}`;
+        message.style.display = 'block';
+      }
+
+      // Cargar archivos
       const cargarArchivos = () => {
         fetch('https://secureapp-q3uk.onrender.com/controllers/list_files.php', {
           method: 'GET',
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
+          headers: { 'Authorization': 'Bearer ' + token }
         })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
-            tbody.innerHTML = ''; // Limpiar tabla
+            tbody.innerHTML = '';
             data.files.forEach(file => {
               const row = document.createElement('tr');
               row.innerHTML = `
@@ -135,163 +137,94 @@
             });
             table.style.display = 'table';
 
-            // Descargar
-            document.querySelectorAll('.download-btn').forEach(button => {
-              button.addEventListener('click', () => {
+            // Descargar archivo
+            tbody.querySelectorAll('.download-btn').forEach(button => {
+              button.onclick = () => {
                 const fileId = button.getAttribute('data-id');
                 const url = `https://secureapp-q3uk.onrender.com/controllers/download_files.php?file_id=${fileId}`;
                 window.open(url, '_blank');
-              });
+              };
             });
 
-            // Eliminar
-            document.querySelectorAll('.delete-btn').forEach(button => {
-              button.addEventListener('click', () => {
+            // Eliminar archivo
+            tbody.querySelectorAll('.delete-btn').forEach(button => {
+              button.onclick = () => {
                 const fileId = button.getAttribute('data-id');
                 if (confirm('¿Eliminar este archivo?')) {
                   fetch(`https://secureapp-q3uk.onrender.com/controllers/delete_file.php?file_id=${fileId}`, {
                     method: 'GET',
-                    headers: {
-                      'Authorization': 'Bearer ' + token
-                    }
+                    headers: { 'Authorization': 'Bearer ' + token }
                   })
                   .then(res => res.json())
-                  .then(response => {
-                    if (response.success) {
+                  .then(resp => {
+                    if (resp.success) {
                       button.closest('tr').remove();
-                      message.textContent = response.message;
-                      message.className = 'message success';
-                      message.style.display = 'block';
+                      showMessage(resp.message, 'success');
                     } else {
-                      message.textContent = response.error || 'Error al eliminar.';
-                      message.className = 'message error';
-                      message.style.display = 'block';
+                      showMessage(resp.error || 'Error al eliminar.');
                     }
                   })
                   .catch(err => {
-                    message.textContent = 'Error de red: ' + err.message;
-                    message.className = 'message error';
-                    message.style.display = 'block';
+                    showMessage('Error de red: ' + err.message);
                   });
                 }
-              });
+              };
             });
 
           } else {
-            message.textContent = data.error || 'Error al cargar archivos.';
-            message.className = 'message error';
-            message.style.display = 'block';
+            showMessage(data.error || 'Error al cargar archivos.');
           }
         })
         .catch(err => {
-          message.textContent = 'Error de red: ' + err.message;
-          message.className = 'message error';
-          message.style.display = 'block';
+          showMessage('Error de red: ' + err.message);
         });
       };
 
-      // Subida de archivo
+      // Subir archivo
       uploadForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
         const file = fileInput.files[0];
         if (!file) {
-          message.textContent = 'Selecciona un archivo antes de subir.';
-          message.className = 'message error';
-          message.style.display = 'block';
+          showMessage('Selecciona un archivo antes de subir.');
           return;
         }
-  if (!token) {
-    message.textContent = 'Debes iniciar sesión para subir archivos.';
-    message.className = 'message error';
-    message.style.display = 'block';
-    return;
-  }
+
+        if (!token) {
+          showMessage('Debes iniciar sesión para subir archivos.');
+          return;
+        }
 
         const formData = new FormData();
         formData.append('file', file);
-  uploadForm.addEventListener('submit', (e) => {
-    e.preventDefault();
 
         fetch('https://secureapp-q3uk.onrender.com/controllers/upload.php', {
           method: 'POST',
-          headers: {
-            'Authorization': 'Bearer ' + token
-          },
+          headers: { 'Authorization': 'Bearer ' + token },
           body: formData
         })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
-            message.textContent = data.message;
-            message.className = 'message success';
-            message.style.display = 'block';
+            showMessage(data.message, 'success');
             fileInput.value = '';
-            cargarArchivos(); // recargar tabla
+            cargarArchivos();
           } else {
             let errorMsg = data.error || 'Error al subir.';
             if (data.details) {
               errorMsg += ' Detalles: ' + data.details;
             }
-            message.textContent = errorMsg;
-            message.className = 'message error';
-            message.style.display = 'block';
+            showMessage(errorMsg);
           }
         })
         .catch(err => {
-          message.textContent = 'Error de red: ' + err.message;
-          message.className = 'message error';
-          message.style.display = 'block';
+          showMessage('Error de red: ' + err.message);
         });
       });
-    const file = fileInput.files[0];
-    if (!file) {
-      message.textContent = 'Selecciona un archivo antes de subir.';
-      message.className = 'message error';
-      message.style.display = 'block';
-      return;
-    }
 
-      // Cargar archivos al inicio
+      // Cargar archivos al cargar la página
       cargarArchivos();
-    const formData = new FormData();
-    formData.append('file', file);
-
-    fetch('https://secureapp-q3uk.onrender.com/controllers/upload.php', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + token
-      },
-      body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        message.textContent = data.message;
-        message.className = 'message success';
-        message.style.display = 'block';
-        fileInput.value = '';
-        cargarArchivos(); // Función que recarga la tabla
-      } else {
-        let errorMsg = data.error || 'Error al subir.';
-        if (data.details) {
-          errorMsg += ' Detalles: ' + data.details;
-        }
-        message.textContent = errorMsg;
-        message.className = 'message error';
-        message.style.display = 'block';
-      }
-    })
-    .catch(err => {
-      message.textContent = 'Error de red: ' + err.message;
-      message.className = 'message error';
-      message.style.display = 'block';
     });
-  });
-
-  // Cargar archivos al inicio
-  cargarArchivos();
-});
 
   </script>
 </body>
