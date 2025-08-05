@@ -2,9 +2,10 @@
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../auth/check.php';
 
+// ✅ Confirmar autenticación basada en check.php
 $user_id = AUTH_USER;
 
-// 1. Validar parámetro
+// 2. Validar parámetro requerido: id de archivo
 if (!isset($_GET['file_id']) || !is_numeric($_GET['file_id'])) {
     http_response_code(400);
     echo json_encode(["error" => "Parámetro 'file_id' inválido."]);
@@ -14,12 +15,11 @@ if (!isset($_GET['file_id']) || !is_numeric($_GET['file_id'])) {
 $file_id = (int) $_GET['file_id'];
 
 try {
-    // 2. Consultar información del archivo
+    // 3. Consultar archivo y validar propiedad del usuario
     $stmt = $pdo->prepare("SELECT filename, original_name, mime_type FROM user_files WHERE id = :file_id AND user_id = :user_id");
-    $stmt->execute([
-        ':file_id' => $file_id,
-        ':user_id' => $user_id
-    ]);
+    $stmt->bindParam(':file_id', $file_id, PDO::PARAM_INT);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->execute();
 
     $file = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -29,26 +29,24 @@ try {
         exit;
     }
 
-    // 3. Ruta física (igual que en la lógica de eliminación)
-    $upload_dir = realpath(__DIR__ . '/../uploads'); // Asegura ruta absoluta
-    $file_path = $upload_dir . DIRECTORY_SEPARATOR . $file['filename'];
-
-    if (!file_exists($file_path)) {
+    // 4. Verificar existencia física del archivo
+    $filePath = __DIR__ . '/../uploads/' . $file['filename'];
+    if (!file_exists($filePath)) {
         http_response_code(410); // Gone
         echo json_encode(["error" => "Archivo eliminado del servidor."]);
         exit;
     }
 
-    // 4. Forzar descarga segura
+    // 5. Forzar descarga segura
     header('Content-Description: File Transfer');
     header('Content-Type: ' . $file['mime_type']);
     header('Content-Disposition: attachment; filename="' . basename($file['original_name']) . '"');
     header('Expires: 0');
     header('Cache-Control: must-revalidate');
     header('Pragma: public');
-    header('Content-Length: ' . filesize($file_path));
+    header('Content-Length: ' . filesize($filePath));
 
-    readfile($file_path);
+    readfile($filePath);
     exit;
 
 } catch (PDOException $e) {
