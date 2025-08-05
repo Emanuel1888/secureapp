@@ -130,7 +130,7 @@
 
       // Redirigir a verificar_token.php después de mostrar mensaje (puedes ajustar tiempo si quieres)
       setTimeout(() => {
-        window.location.href = 'https://secureapp-q3uk.onrender.com/authverify_token.php';
+        window.location.href = 'https://secureapp-q3uk.onrender.com/auth/verify_token.php';
       }, 1000); // 1 segundo de espera para que vea el mensaje
     } else {
       responseDiv.style.color = 'red';
