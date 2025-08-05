@@ -104,7 +104,8 @@
   </div>
 
   <script>
-   form.addEventListener('submit', async (e) => {
+ const form = document.getElementById('loginForm'); // declara aquí
+  form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const username = document.getElementById('username').value.trim();
