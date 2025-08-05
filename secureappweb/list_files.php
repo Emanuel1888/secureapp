@@ -149,7 +149,7 @@
     message.style.display = 'block';
   });
 });
-
+<!--                Descarga Lógica -->
     if (!token) {
       message.textContent = 'Token no encontrado. Inicia sesión.';
       message.className = 'message error';
