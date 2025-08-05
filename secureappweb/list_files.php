@@ -70,8 +70,8 @@
   <label for="fileInput">Subir imagen:</label>
   <input type="file" id="fileInput" name="file" accept="image/*" required />
   <button type="submit" class="btn upload-btn">Subir</button>
-</form
-  <div id="message" class="message" style="display: none;"></div>
+</form>
+<div id="message" class="message" style="display: none;"></div>
 
   <table id="filesTable" class="file-list" style="display: none;">
     <thead>
