@@ -123,31 +123,35 @@
   formData.append('file', file);
 
   fetch('https://secureapp-q3uk.onrender.com/controllers/upload.php', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + token
-    },
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      message.textContent = data.message;
-      message.className = 'message success';
-      message.style.display = 'block';
-      fileInput.value = '';
-      setTimeout(() => location.reload(), 1000); // recargar tabla después de 1s
-    } else {
-      message.textContent = data.error || 'Error al subir.';
-      message.className = 'message error';
-      message.style.display = 'block';
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer ' + token
+  },
+  body: formData
+})
+.then(res => res.json())
+.then(data => {
+  if (data.success) {
+    message.textContent = data.message;
+    message.className = 'message success';
+    message.style.display = 'block';
+    fileInput.value = '';
+    setTimeout(() => location.reload(), 1000); // recargar tabla después de 1s
+  } else {
+    // Mostrar error completo con detalles si existen
+    let errorMsg = data.error || 'Error al subir.';
+    if (data.details) {
+      errorMsg += ' Detalles: ' + data.details;
     }
-  })
-  .catch(err => {
-    message.textContent = 'Error de red: ' + err.message;
+    message.textContent = errorMsg;
     message.className = 'message error';
     message.style.display = 'block';
-  });
+  }
+})
+.catch(err => {
+  message.textContent = 'Error de red: ' + err.message;
+  message.className = 'message error';
+  message.style.display = 'block';
 });
 //                Descarga Lógica
     if (!token) {
