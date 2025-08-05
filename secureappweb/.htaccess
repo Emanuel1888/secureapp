@@ -3,8 +3,8 @@ RewriteEngine On
 
 # MODIFICAIÓN 2, Quitamos la redirección forzda a HTTPS###################
 # Redirigir todas las solicitudes a HTTPS si no están en HTTPS
-RewriteCond %{HTTPS} !=on
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# RewriteCond %{HTTPS} !=on
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Seguridad adicional recomendada
 
