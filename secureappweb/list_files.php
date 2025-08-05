@@ -122,7 +122,7 @@
   const formData = new FormData();
   formData.append('file', file);
 
-  fetch('https://secureapp-q3uk.onrender.com/controllers/upload_file.php', {
+  fetch('https://secureapp-q3uk.onrender.com/controllers/upload.php', {
     method: 'POST',
     headers: {
       'Authorization': 'Bearer ' + token
