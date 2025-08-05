@@ -56,11 +56,21 @@
       background-color: #f44336;
       color: white;
     }
+    .upload-btn {
+      background-color: #2196f3;
+      color: white;
+    }
+
   </style>
 </head>
 <body>
   <h1>Archivos del Usuario</h1>
-
+<!-- Formulario para subir archivo -->
+<form id="uploadForm" enctype="multipart/form-data">
+  <label for="fileInput">Subir imagen:</label>
+  <input type="file" id="fileInput" name="file" accept="image/*" required />
+  <button type="submit" class="btn upload-btn">Subir</button>
+</form
   <div id="message" class="message" style="display: none;"></div>
 
   <table id="filesTable" class="file-list" style="display: none;">
@@ -86,6 +96,59 @@
     const message = document.getElementById('message');
     const table = document.getElementById('filesTable');
     const tbody = document.getElementById('filesBody');
+    
+    const uploadForm = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+
+    uploadForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const token = localStorage.getItem('jwt_token');
+  if (!token) {
+    message.textContent = 'No hay token. Inicia sesión.';
+    message.className = 'message error';
+    message.style.display = 'block';
+    return;
+  }
+
+  const file = fileInput.files[0];
+  if (!file) {
+    message.textContent = 'Selecciona un archivo antes de subir.';
+    message.className = 'message error';
+    message.style.display = 'block';
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  fetch('https://secureapp-q3uk.onrender.com/controllers/upload_file.php', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + token
+    },
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      message.textContent = data.message;
+      message.className = 'message success';
+      message.style.display = 'block';
+      fileInput.value = '';
+      setTimeout(() => location.reload(), 1000); // recargar tabla después de 1s
+    } else {
+      message.textContent = data.error || 'Error al subir.';
+      message.className = 'message error';
+      message.style.display = 'block';
+    }
+  })
+  .catch(err => {
+    message.textContent = 'Error de red: ' + err.message;
+    message.className = 'message error';
+    message.style.display = 'block';
+  });
+});
 
     if (!token) {
       message.textContent = 'Token no encontrado. Inicia sesión.';
