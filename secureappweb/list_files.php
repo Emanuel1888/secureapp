@@ -138,13 +138,45 @@
             table.style.display = 'table';
 
             // Descargar archivo
-            tbody.querySelectorAll('.download-btn').forEach(button => {
-              button.onclick = () => {
-                const fileId = button.getAttribute('data-id');
-                const url = `https://secureapp-q3uk.onrender.com/controllers/download_files.php?file_id=${fileId}`;
-                window.open(url, '_blank');
-              };
-            });
+           tbody.querySelectorAll('.download-btn').forEach(button => {
+  button.onclick = async () => {
+    const fileId = button.getAttribute('data-id');
+    try {
+      const response = await fetch(`https://secureapp-q3uk.onrender.com/controllers/download_files.php?file_id=${fileId}`, {
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+
+      if (!response.ok) {
+        const errorJson = await response.json();
+        alert('Error: ' + (errorJson.error || 'Error al descargar.'));
+        return;
+      }
+
+      // Obtener nombre archivo desde headers Content-Disposition
+      const disposition = response.headers.get('Content-Disposition');
+      let filename = 'archivo_descargado';
+      if (disposition && disposition.indexOf('filename=') !== -1) {
+        const match = disposition.match(/filename="(.+)"/);
+        if (match.length === 2) filename = match[1];
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      alert('Error de red al descargar: ' + error.message);
+    }
+  };
+});
+
 
             // Eliminar archivo
             tbody.querySelectorAll('.delete-btn').forEach(button => {
